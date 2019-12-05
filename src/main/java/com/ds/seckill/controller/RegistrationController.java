@@ -1,0 +1,99 @@
+package com.ds.seckill.controller;
+
+import com.ds.seckill.service.ConsumerService;
+import com.ds.seckill.service.SellerService;
+import com.ds.seckill.util.JsonUtil;
+import com.ds.seckill.util.HttpSessionUtil;
+import com.ds.seckill.util.dto.DTO;
+import com.ds.seckill.util.dto.DTOUtil;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping(
+        value = {"/authentication"}
+)
+public class RegistrationController {
+
+    @Resource
+    ConsumerService consumerService;
+
+    @Resource
+    SellerService sellerService;
+
+
+    @RequestMapping(
+            value = {"/register"},
+            method = {RequestMethod.POST},
+            headers = {"Accept=application/json"},
+            produces = {"application/json;charset=UTF-8"}
+    )
+
+    public @ResponseBody DTO register(@RequestBody String jsonString){
+
+        JsonObject jsonObject = (JsonObject) JsonParser.parseString(jsonString);
+        String name = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
+                role = JsonUtil.getFromJsonObjectAsString(jsonObject, "role"),
+                password = JsonUtil.getFromJsonObjectAsString(jsonObject, "password");
+
+        if(role != null && role.equals("consumer"))
+            return consumerService.register(name, password);
+
+        if(role != null && role.equals("seller"))
+            return sellerService.register(name, password);
+
+        return DTOUtil.newInvalidUserDTO("100");
+    }
+
+    @RequestMapping(
+            value = {"/sign_in"},
+            method = {RequestMethod.POST}
+    )
+    public @ResponseBody DTO signIn(@RequestBody String jsonString, HttpSession httpSession){
+
+        JsonObject jsonObject = (JsonObject)JsonParser.parseString(jsonString);
+        String name = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
+                role = JsonUtil.getFromJsonObjectAsString(jsonObject, "role"),
+                password = JsonUtil.getFromJsonObjectAsString(jsonObject, "password");
+
+        //Logged in already
+        if(HttpSessionUtil.checkLoggedIn(httpSession, name, role))
+            return DTOUtil.newInstance(true, "001", "User logged in already", null);
+
+        //Not logged in
+        if(role.equals("consumer"))
+            return consumerService.logIn(name, password, httpSession);
+
+        if(role.equals("seller"))
+            return sellerService.logIn(name, password, httpSession);
+
+        return DTOUtil.newInvalidUserDTO("100");
+    }
+
+    @RequestMapping(
+            value = {"/sign_out"},
+            method = {RequestMethod.POST}
+    )
+    public @ResponseBody DTO signOut(@RequestBody String jsonString, HttpSession httpSession){
+
+        JsonObject jsonObject = (JsonObject) JsonParser.parseString(jsonString);
+        String username = JsonUtil.getFromJsonObjectAsString(jsonObject, "username"),
+                role = JsonUtil.getFromJsonObjectAsString(jsonObject,"role");
+
+        //not logged in
+        if(!HttpSessionUtil.checkLoggedIn(httpSession, username, role))
+            return DTOUtil.newInstance(false, "100", "Not logged in.", null);
+
+        //success
+        HttpSessionUtil.logOut(httpSession);
+        return DTOUtil.newInstance(true, "000", "Logged out successfully.", null);
+    }
+}
