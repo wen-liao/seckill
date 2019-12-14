@@ -8,6 +8,8 @@ import com.ds.seckill.util.dto.DTO;
 import com.ds.seckill.util.dto.DTOUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,8 @@ import javax.servlet.http.HttpSession;
         value = {"/authentication"}
 )
 public class RegistrationController {
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     ConsumerService consumerService;
@@ -39,10 +43,15 @@ public class RegistrationController {
 
     public @ResponseBody DTO register(@RequestBody String jsonString){
 
+        logger.info("authentication/register");
+
         JsonObject jsonObject = (JsonObject) JsonParser.parseString(jsonString);
         String name = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
                 role = JsonUtil.getFromJsonObjectAsString(jsonObject, "role"),
                 password = JsonUtil.getFromJsonObjectAsString(jsonObject, "password");
+        logger.info("name: " + name);
+        logger.info("role: " + role);
+        logger.info("password: " + password);
 
         if(role != null && role.equals("consumer"))
             return consumerService.register(name, password);
