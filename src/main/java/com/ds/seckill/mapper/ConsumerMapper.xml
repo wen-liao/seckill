@@ -5,6 +5,6 @@
         select * from consumer where name = #{name}
     </select>
     <insert id="insertConsumer" parameterType="com.ds.seckill.model.Consumer">
-        insert into consumer values(#{id}, #{name}, #{account})
+        insert into consumer (name, passwordDigest, bankAccount) values (#{name}, #{passwordDigest}, #{bankAccount})
     </insert>
 </mapper>

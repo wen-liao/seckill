@@ -10,27 +10,29 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping(
         value = {"/authentication"}
 )
-public class RegistrationController {
+public class AuthenticationController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Resource
+    @Autowired
     ConsumerService consumerService;
 
-    @Resource
+    @Autowired
     SellerService sellerService;
 
 
@@ -43,7 +45,7 @@ public class RegistrationController {
 
     public @ResponseBody DTO register(@RequestBody String jsonString){
 
-        logger.info("authentication/register");
+        logger.info("/authentication/register");
 
         JsonObject jsonObject = (JsonObject) JsonParser.parseString(jsonString);
         String name = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
@@ -68,18 +70,25 @@ public class RegistrationController {
     )
     public @ResponseBody DTO signIn(@RequestBody String jsonString, HttpSession httpSession){
 
+        logger.info("/authentication/sign_in");
+
         JsonObject jsonObject = (JsonObject)JsonParser.parseString(jsonString);
         String name = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
                 role = JsonUtil.getFromJsonObjectAsString(jsonObject, "role"),
                 password = JsonUtil.getFromJsonObjectAsString(jsonObject, "password");
+        logger.info("name: {}", name);
+        logger.info("role: {}", role);
+        logger.info("password: {}", password);
 
         //Logged in already
-        if(HttpSessionUtil.checkLoggedIn(httpSession, name, role))
-            return DTOUtil.newInstance(true, "001", "User logged in already", null);
-
+        if(HttpSessionUtil.checkSignedIn(httpSession, name, role, logger)) {
+            String message = "User logged in already";
+            logger.info("message: {}", message);
+            return DTOUtil.newInstance(true, "001", message, null);
+        }
         //Not logged in
         if(role.equals("consumer"))
-            return consumerService.logIn(name, password, httpSession);
+            return consumerService.signIn(name, password, httpSession);
 
         if(role.equals("seller"))
             return sellerService.logIn(name, password, httpSession);
@@ -93,16 +102,21 @@ public class RegistrationController {
     )
     public @ResponseBody DTO signOut(@RequestBody String jsonString, HttpSession httpSession){
 
+        logger.info("/authentication/sign_out");
         JsonObject jsonObject = (JsonObject) JsonParser.parseString(jsonString);
-        String username = JsonUtil.getFromJsonObjectAsString(jsonObject, "username"),
+        String username = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
                 role = JsonUtil.getFromJsonObjectAsString(jsonObject,"role");
 
         //not logged in
-        if(!HttpSessionUtil.checkLoggedIn(httpSession, username, role))
-            return DTOUtil.newInstance(false, "100", "Not logged in.", null);
+        if(!HttpSessionUtil.checkSignedIn(httpSession, username, role, logger)) {
+            String message = "Not logged in.";
+            logger.info("message: {}", message);
+            return DTOUtil.newInstance(false, "100", message, null);
+        }
 
         //success
-        HttpSessionUtil.logOut(httpSession);
-        return DTOUtil.newInstance(true, "000", "Logged out successfully.", null);
+        HttpSessionUtil.signOut(httpSession, logger);
+        String message = "Logged out successfully.";
+        return DTOUtil.newInstance(true, "000", message, null);
     }
 }

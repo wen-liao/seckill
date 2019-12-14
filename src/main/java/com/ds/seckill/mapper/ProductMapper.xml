@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ds.seckill.mapper.ProductMapper">
     <insert id="insertProduct" parameterType="com.ds.seckill.model.Product" useGeneratedKeys="true">
-        insert into product values(#{id}, #{seller.id}, #{name}, #{description}, #{price}, #{count})
+        insert into product  values(#{id}, #{sellerId}, #{name}, #{description}, #{count}, #{price})
     </insert>
     <select id="getProductsForSale" resultType="com.ds.seckill.model.Product">
         select * from product where count > 0

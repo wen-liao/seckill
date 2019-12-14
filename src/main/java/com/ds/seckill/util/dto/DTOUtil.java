@@ -1,5 +1,7 @@
 package com.ds.seckill.util.dto;
 
+import java.io.Serializable;
+
 public class DTOUtil {
 
     public static <T> DTO newInstance(boolean isSuccess, String statusCode, String message, T data){

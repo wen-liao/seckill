@@ -2,7 +2,7 @@ package com.ds.seckill.util.dto;
 
 import java.io.Serializable;
 
-public class DTO <T> implements Serializable {
+public class DTO<T>  implements Serializable {
 
     private boolean isSuccessful;
     private String statusCode;
@@ -16,12 +16,12 @@ public class DTO <T> implements Serializable {
         this.data = data;
     }
 
-    public boolean getIsSuccess() {
+    public boolean isSuccessful() {
         return isSuccessful;
     }
 
-    public void setIsSuccess(boolean isSuccess) {
-        this.isSuccessful = isSuccess;
+    public void setSuccessful(boolean successful) {
+        isSuccessful = successful;
     }
 
     public String getStatusCode() {

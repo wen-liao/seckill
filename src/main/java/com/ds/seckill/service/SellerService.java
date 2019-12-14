@@ -1,8 +1,10 @@
 package com.ds.seckill.service;
 
 import com.ds.seckill.util.dto.DTO;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 
 public interface SellerService {
 
@@ -11,5 +13,5 @@ public interface SellerService {
     DTO logIn(String name, String password, HttpSession httpSession);
 
     //TODO: price
-    DTO releaseProduct(String sellerName, String name, String description, double price, int count);
+    DTO releaseProduct(String sellerName, String name, String description, BigDecimal price, int count);
 }

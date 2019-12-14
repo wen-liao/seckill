@@ -1,14 +1,16 @@
 package com.ds.seckill.model;
 
-public class Seller {
+import java.io.Serializable;
+
+public class Seller implements Serializable {
 
     private Integer id;
     private String name;
     private String passwordDigest;
-    private Integer account;
+    private Integer bankAccount;
 
-    public Seller(Integer id, String name, String passwordDigest, Integer account){
-        this.id = id; this.name = name; this.passwordDigest = passwordDigest; this.account = account;
+    public Seller(Integer id, String name, String passwordDigest, Integer bankAccount){
+        this.id = id; this.name = name; this.passwordDigest = passwordDigest; this.bankAccount = bankAccount;
     }
 
     public Integer getId() {
@@ -27,12 +29,12 @@ public class Seller {
         this.name = name;
     }
 
-    public Integer getAccount() {
-        return account;
+    public Integer getBankAccount() {
+        return bankAccount;
     }
 
-    public void setAccount(Integer account) {
-        this.account = account;
+    public void setBankAccount(Integer bankAccount) {
+        this.bankAccount = bankAccount;
     }
 
     public String getPasswordDigest() {
@@ -41,5 +43,14 @@ public class Seller {
 
     public void setPasswordDigest(String passwordDigest) {
         this.passwordDigest = passwordDigest;
+    }
+
+    @Override
+    public String toString(){
+        return new StringBuilder("{ id:").append(id)
+                .append(", name:").append(name)
+                .append(", passwordDigest:").append(passwordDigest)
+                .append(", bankAccount:").append(bankAccount)
+                .append("}").toString();
     }
 }

@@ -1,32 +1,31 @@
 package com.ds.seckill.model;
 
-public class Product {
+import java.io.Serializable;
+import java.math.BigDecimal;
 
-    private int id;
-    private Seller seller;
+public class Product implements Serializable {
+
+    private Integer id;
+    private Integer sellerId;
     private String name;
     private String description;
-    private double price;
-    private int count;
+    private BigDecimal price;
+    private Integer count;
 
-    public Product(Seller seller, String name, String description, double price, int count){
-        this.seller = seller; this.name = name; this.description = description; this.price = price; this.count = count;
+    public Product(Integer sellerId, String name, String description, Integer count, BigDecimal price){
+        this.sellerId = sellerId; this.name = name; this.description = description; this.count = count; this.price = price;
     }
 
-    public int getId() {
+    public Product(Integer id, Integer sellerId, String name, String description, Integer count, BigDecimal price){
+        this.id = id; this.sellerId = sellerId; this.name = name; this.description = description; this.count = count; this.price = price;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Seller getSeller() {
-        return seller;
-    }
-
-    public void setSeller(Seller seller) {
-        this.seller = seller;
     }
 
     public String getName() {
@@ -45,19 +44,38 @@ public class Product {
         this.description = description;
     }
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(Integer count) {
         this.count = count;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Integer sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    @Override
+    public String toString(){
+        return new StringBuilder("{id:").append(id)
+                .append(", sellerId:").append(sellerId)
+                .append(", name:").append(name)
+                .append(", description:").append(description)
+                .append(", price:").append(price)
+                .append(", count:").append(count)
+                .append("}").toString();
     }
 }

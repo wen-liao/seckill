@@ -5,6 +5,6 @@
         select * from seller where name = #{name}
     </select>
     <insert id="insertSeller" parameterType="com.ds.seckill.model.Seller" useGeneratedKeys="true">
-        insert into seller values(#{id}, #{name}, #{account})
+        insert into seller (name, passwordDigest, bankAccount) values(#{name}, #{passwordDigest}, #{bankAccount})
     </insert>
 </mapper>
