@@ -15,4 +15,6 @@ public interface ConsumerService {
 
     DTO order(int id, int consumerId);
 
+    DTO getCartInformation(int id);
+
 }

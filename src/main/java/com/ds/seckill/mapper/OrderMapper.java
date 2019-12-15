@@ -10,4 +10,6 @@ public interface OrderMapper {
 
     Order getOrder(Order order);
 
+    Order[] getOrdersByConsumerId(int consumerId);
+
 }

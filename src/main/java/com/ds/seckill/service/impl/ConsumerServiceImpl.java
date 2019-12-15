@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +101,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
         Product[] products = productMapper.getProductsForSale();
         logger.info("products: {}", products);
-        HashMap<String, Serializable> data = new HashMap(){{
+        Map<String, Serializable> data = new HashMap(){{
             put("num", products.length);
             put("products", products);
         }};
@@ -112,21 +113,35 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     @Override
     public DTO order(int id, int consumerId){
-        logger.info("consumerService.order(id, consumerId)");
-        logger.info("id: {}",id);
-        logger.info("consumerId: {}", consumerId);
+        logger.info("consumerService.order({}, {})", id, consumerId);
+
+        //TODO: Caching Strategy
+        // 1. releasing the product
+        // 1.1 add product to redis
+        // 1.2 add product to MySQL
+        // 2. ordering the product
+        // 2.1 get product from redis
+        // 2.2 write the order request to Kafka brokers
+        // 3 Kafka consumer
+        // 3.1 pull data from Kafka brokers
+        // 3.2 write data to MySQL
 
         //TODO: transaction
         // 1. succeed in getting a product
         logger.info("productMapper.orderProduct({})",id);
+
+        //TODO:
+        // 1. acquire the product from redis
+        // 2. write the requests to message queue
         if(productMapper.orderProduct(id) != 1) {
             logger.info("Unable to make an order.");
             //throw new SQLException("unable to get a product");
         }
         else{
-            Date now = new Date();
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             Order order = new Order(id, consumerId, now, 0);
             logger.info("orderMapper.insertOrder({})",order);
+
             if(orderMapper.insertOrder(order) != 1) {
                 logger.info("Unable to save an order.");
                 //throw new SQLException("unable to create an order");
@@ -140,5 +155,16 @@ public class ConsumerServiceImpl implements ConsumerService {
             }
         }
         return DTOUtil.newInstance(false, "102", "Fail to order", null);
+    }
+
+    @Override
+    public DTO getCartInformation(int consumerId){
+        logger.info("consumerService.getCartInformation({})", consumerId);
+        Order[] orders = orderMapper.getOrdersByConsumerId(consumerId);
+        Map<String,Object> data = new HashMap(){{
+            put("num", orders.length);
+            put("orders", orders);
+        }};
+        return DTOUtil.newInstance(true, "000", "Success", data);
     }
 }

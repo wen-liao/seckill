@@ -7,4 +7,7 @@
     <select id="getOrder" parameterType="com.ds.seckill.model.Order" resultType="com.ds.seckill.model.Order">
         select * from order_ where productId = #{productId} and consumerId = #{consumerId} and timestamp = #{timestamp} and  paid = #{paid}
     </select>
+    <select id = "getOrdersByConsumerId" resultType="com.ds.seckill.model.Order">
+        select * from order_ where consumerId = #{consumerId}
+    </select>
 </mapper>

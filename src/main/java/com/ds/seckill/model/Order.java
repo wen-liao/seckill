@@ -1,53 +1,54 @@
 package com.ds.seckill.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class Order implements Serializable {
 
-    private int id;
-    private int productId;
-    private int consumerId;
-    private Date timestamp;
-    private int paid;
+    private Integer id;
+    private Integer productId;
+    private Integer consumerId;
+    private Timestamp timestamp;
+    private Integer paid;
 
-    public Order(int id, int productId, int consumerId, Date timestamp, int paid){
+    public Order(Integer id, Integer productId, Integer consumerId, Timestamp timestamp, Integer paid){
         this.id = id; this.productId=productId; this.consumerId = consumerId; this.timestamp = timestamp; this.paid = paid;
     }
 
-    public Order(int productId, int consumerId, Date timestamp, int paid){
+    public Order(Integer productId, Integer consumerId, Timestamp timestamp, Integer paid){
         this.productId = productId; this.consumerId = consumerId; this.timestamp = timestamp; this.paid = paid;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getProductId() {
+    public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Integer productId) {
         this.productId = productId;
     }
 
-    public int getConsumerId() {
+    public Integer getConsumerId() {
         return consumerId;
     }
 
-    public void setConsumerId(int consumerId) {
+    public void setConsumerId(Integer consumerId) {
         this.consumerId = consumerId;
     }
 
-    public int getPaid() {
+    public Integer getPaid() {
         return paid;
     }
 
-    public void setPaid(int paid) {
+    public void setPaid(Integer paid) {
         this.paid = paid;
     }
 
@@ -55,7 +56,7 @@ public class Order implements Serializable {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 

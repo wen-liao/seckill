@@ -58,4 +58,20 @@ public class ConsumerController {
         return consumerService.order(id, consumerId);
     }
 
+    @ResponseBody
+    @RequestMapping(
+            value = {"/cart_info"},
+            method = {RequestMethod.GET},
+            produces = {"application/json;charset=utf-8"}
+    )
+    public DTO getCartInformation(HttpSession httpSession){
+        logger.info("/cart_info");
+        if(!HttpSessionUtil.isSignedIn(httpSession, logger))
+            return DTOUtil.newNotLoggedInDTO("100");
+        if(!HttpSessionUtil.isConsumer(httpSession, logger))
+            return DTOUtil.newMismatchedRoleDTO("101");
+        //TODO: getCartInfo
+        int consumerId = (Integer) httpSession.getAttribute("id");
+        return consumerService.getCartInformation(consumerId);
+    }
 }

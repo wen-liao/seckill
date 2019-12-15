@@ -79,6 +79,8 @@ public class SellerServiceImpl implements SellerService {
 
         Seller seller = sellerMapper.getSellerByName(sellerName);
         logger.info("seller: {}", seller);
+
+        //TODO: write product information into Redis server
         productMapper.insertProduct(new Product(seller.getId(), name, description, count, price));
 
         String message = "Release product successfully";
