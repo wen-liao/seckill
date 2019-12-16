@@ -1,5 +1,6 @@
 package com.ds.seckill.service.impl;
 
+import com.ds.seckill.exception.UnableToSaveOrderException;
 import com.ds.seckill.mapper.ConsumerMapper;
 import com.ds.seckill.mapper.OrderMapper;
 import com.ds.seckill.mapper.ProductMapper;
@@ -9,7 +10,6 @@ import com.ds.seckill.model.Product;
 import com.ds.seckill.service.ConsumerService;
 import com.ds.seckill.util.DigestUtil;
 import com.ds.seckill.util.HttpSessionUtil;
-import com.ds.seckill.util.TimeUtil;
 import com.ds.seckill.util.dto.DTO;
 import com.ds.seckill.util.dto.DTOUtil;
 import org.slf4j.Logger;
@@ -22,11 +22,10 @@ import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+@Transactional(rollbackFor = SQLException.class)
 @Service
 public class ConsumerServiceImpl implements ConsumerService {
 
@@ -112,7 +111,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     }
 
     @Override
-    public DTO order(int id, int consumerId){
+    public DTO order(int id, int consumerId) throws UnableToSaveOrderException{
         logger.info("consumerService.order({}, {})", id, consumerId);
 
         //TODO: Caching Strategy
@@ -135,7 +134,6 @@ public class ConsumerServiceImpl implements ConsumerService {
         // 2. write the requests to message queue
         if(productMapper.orderProduct(id) != 1) {
             logger.info("Unable to make an order.");
-            //throw new SQLException("unable to get a product");
         }
         else{
             Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -144,7 +142,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
             if(orderMapper.insertOrder(order) != 1) {
                 logger.info("Unable to save an order.");
-                //throw new SQLException("unable to create an order");
+                throw new UnableToSaveOrderException();
             }
             else {
                 // 2. create an order

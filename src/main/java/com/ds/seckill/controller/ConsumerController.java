@@ -1,10 +1,10 @@
 package com.ds.seckill.controller;
 
+import com.ds.seckill.exception.UnableToSaveOrderException;
 import com.ds.seckill.service.ConsumerService;
 import com.ds.seckill.util.HttpSessionUtil;
 import com.ds.seckill.util.dto.DTO;
 import com.ds.seckill.util.dto.DTOUtil;
-
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class ConsumerController {
             method = {RequestMethod.POST},
             produces = {"application/json;charset=utf-8"}
     )
-    public DTO order(@Param("id") int id, HttpSession httpSession) throws Exception{
+    public DTO order(@Param("id") int id, HttpSession httpSession){
         logger.info("/consumer/order");
         logger.info("id: {}", id);
 
@@ -55,7 +55,12 @@ public class ConsumerController {
         if(!HttpSessionUtil.isConsumer(httpSession, logger))
             return DTOUtil.newMismatchedRoleDTO("101");
         int consumerId = (Integer) httpSession.getAttribute("id");
-        return consumerService.order(id, consumerId);
+        try {
+            return consumerService.order(id, consumerId);
+        }catch(UnableToSaveOrderException e){
+            logger.error(e.getLocalizedMessage());
+        }
+        return DTOUtil.newInstance(false, "102", "Fail to order", null);
     }
 
     @ResponseBody

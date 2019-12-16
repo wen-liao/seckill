@@ -1,7 +1,6 @@
 package com.ds.seckill.service;
 
 import com.ds.seckill.util.dto.DTO;
-import org.slf4j.Logger;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;

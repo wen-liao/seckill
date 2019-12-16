@@ -1,9 +1,9 @@
 package com.ds.seckill.service;
 
+import com.ds.seckill.exception.UnableToSaveOrderException;
 import com.ds.seckill.util.dto.DTO;
 
 import javax.servlet.http.HttpSession;
-import java.sql.SQLException;
 
 public interface ConsumerService {
 
@@ -13,7 +13,7 @@ public interface ConsumerService {
 
     DTO getProductsForSale();
 
-    DTO order(int id, int consumerId);
+    DTO order(int id, int consumerId) throws UnableToSaveOrderException;
 
     DTO getCartInformation(int id);
 

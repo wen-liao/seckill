@@ -5,18 +5,20 @@ import com.ds.seckill.mapper.SellerMapper;
 import com.ds.seckill.model.Product;
 import com.ds.seckill.model.Seller;
 import com.ds.seckill.service.SellerService;
+import com.ds.seckill.util.DigestUtil;
 import com.ds.seckill.util.HttpSessionUtil;
 import com.ds.seckill.util.dto.DTO;
-import com.ds.seckill.util.DigestUtil;
 import com.ds.seckill.util.dto.DTOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 
+@Transactional
 @Service
 public class SellerServiceImpl implements SellerService {
 

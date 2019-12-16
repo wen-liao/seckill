@@ -1,7 +1,5 @@
 package com.ds.seckill.model;
 
-import com.ds.seckill.util.DigestUtil;
-
 import java.io.Serializable;
 
 public class Consumer implements Serializable {
