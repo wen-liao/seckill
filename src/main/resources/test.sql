@@ -1,4 +1,7 @@
 #购物系统
+
+#DB: seckill
+
 CREATE TABLE consumer(
 	id INT AUTO_INCREMENT,
 	name VARCHAR(30) UNIQUE NOT NULL,

@@ -52,7 +52,7 @@ public class Order implements Serializable {
         this.paid = paid;
     }
 
-    public Date getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
@@ -66,6 +66,7 @@ public class Order implements Serializable {
                 .append(", productId:").append(productId)
                 .append(", consumerId:").append(consumerId)
                 .append(", timestamp:").append(timestamp.toString())
-                .append(", paid:").append(paid).toString();
+                .append(", paid:").append(paid)
+                .append("}").toString();
     }
 }

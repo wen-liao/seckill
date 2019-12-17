@@ -1,10 +1,23 @@
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT&useUnicode=true&characterEncoding=utf8
-        username: user
-        password: user
+        url: jdbc:mysql://10.141.212.225:3306/seckill?serverTimezone=GMT&useUnicode=true&characterEncoding=utf8
+        username: mysql
 
+    redis:
+        database: 1
+        host: 10.141.212.225
+        port: 6379
+
+    kafka:
+        bootstrap-servers: 10.141.212.225:9092, 10.141.212.227:9092
+        producer:
+            value-serializer: com.ds.seckill.util.serialization.OrderSerializer
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 mybatis:
     mapper-locations: classpath:mapper/**.xml
+
+logging:
+    level:
+        root: info

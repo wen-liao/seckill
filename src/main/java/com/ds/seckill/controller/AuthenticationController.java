@@ -45,7 +45,7 @@ public class AuthenticationController {
 
         logger.info("/authentication/register");
 
-        JsonObject jsonObject = (JsonObject) JsonParser.parseString(jsonString);
+        JsonObject jsonObject = (JsonObject) new JsonParser().parse(jsonString);
         String name = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
                 role = JsonUtil.getFromJsonObjectAsString(jsonObject, "role"),
                 password = JsonUtil.getFromJsonObjectAsString(jsonObject, "password");
@@ -70,7 +70,7 @@ public class AuthenticationController {
 
         logger.info("/authentication/sign_in");
 
-        JsonObject jsonObject = (JsonObject)JsonParser.parseString(jsonString);
+        JsonObject jsonObject = (JsonObject)new JsonParser().parse(jsonString);
         String name = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
                 role = JsonUtil.getFromJsonObjectAsString(jsonObject, "role"),
                 password = JsonUtil.getFromJsonObjectAsString(jsonObject, "password");
@@ -101,7 +101,7 @@ public class AuthenticationController {
     public @ResponseBody DTO signOut(@RequestBody String jsonString, HttpSession httpSession){
 
         logger.info("/authentication/sign_out");
-        JsonObject jsonObject = (JsonObject) JsonParser.parseString(jsonString);
+        JsonObject jsonObject = (JsonObject) new JsonParser().parse(jsonString);
         String username = JsonUtil.getFromJsonObjectAsString(jsonObject, "name"),
                 role = JsonUtil.getFromJsonObjectAsString(jsonObject,"role");
 

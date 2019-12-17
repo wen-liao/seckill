@@ -12,4 +12,6 @@ public interface ProductMapper {
 
     int orderProduct(int id);
 
+    Product getProduct(Product product);
+
 }

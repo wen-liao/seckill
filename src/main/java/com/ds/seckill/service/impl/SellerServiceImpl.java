@@ -4,13 +4,17 @@ import com.ds.seckill.mapper.ProductMapper;
 import com.ds.seckill.mapper.SellerMapper;
 import com.ds.seckill.model.Product;
 import com.ds.seckill.model.Seller;
+import com.ds.seckill.util.RedisUtil;
 import com.ds.seckill.service.SellerService;
 import com.ds.seckill.util.DigestUtil;
 import com.ds.seckill.util.HttpSessionUtil;
 import com.ds.seckill.util.dto.DTO;
 import com.ds.seckill.util.dto.DTOUtil;
+import io.lettuce.core.RedisException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +22,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 
-@Transactional
+import static com.ds.seckill.util.RedisUtil.*;
+
 @Service
 public class SellerServiceImpl implements SellerService {
 
@@ -29,6 +34,27 @@ public class SellerServiceImpl implements SellerService {
 
     @Resource
     ProductMapper productMapper;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    public boolean putProduct(Integer productId, Integer count){
+        String product = productId.toString();
+        redisTemplate.setEnableTransactionSupport(true);
+
+        //optimistic concurrency control
+        logger.info("watch({}, {})", ProductKey, product);
+        watch(redisTemplate, ProductKey, product);
+        try {
+            redisTemplate.multi();
+            put(redisTemplate, ProductKey, product, count);//针对失败的情况
+            redisTemplate.exec();
+            return true;
+        }catch (Exception e){
+            redisTemplate.discard();
+            return false;
+        }
+    }
 
     @Override
     public DTO register(String name, String password){
@@ -41,7 +67,6 @@ public class SellerServiceImpl implements SellerService {
         logger.info("passwordDigest: {}", passwordDigest);
 
         if(sellerMapper.getSellerByName(name) == null){
-            //TODO: transaction
             String message = "Register Successfully";
             sellerMapper.insertSeller(new Seller(null, name, passwordDigest, null));
             logger.info("message: {}", message);
@@ -83,8 +108,16 @@ public class SellerServiceImpl implements SellerService {
         logger.info("seller: {}", seller);
 
         //TODO: write product information into Redis server
-        productMapper.insertProduct(new Product(seller.getId(), name, description, count, price));
+        Product product = new Product(seller.getId(), name, description, count, price);
+        productMapper.insertProduct(product);
+        product = productMapper.getProduct(product);
+        logger.info("product: {}", product);
 
+        //put record to redis
+        logger.info("redisUtil.putProduct({}, {}", product.getId(), product.getCount());
+        if(!putProduct(product.getId(), product.getCount())){
+            throw new RedisException("unable to cache");
+        }
         String message = "Release product successfully";
         logger.info(message);
         return DTOUtil.newInstance(true, "000", message, null);

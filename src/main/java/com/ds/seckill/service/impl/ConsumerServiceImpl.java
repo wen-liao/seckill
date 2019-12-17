@@ -1,5 +1,6 @@
 package com.ds.seckill.service.impl;
 
+import com.ds.seckill.exception.UnableToOrderException;
 import com.ds.seckill.exception.UnableToSaveOrderException;
 import com.ds.seckill.mapper.ConsumerMapper;
 import com.ds.seckill.mapper.OrderMapper;
@@ -8,28 +9,31 @@ import com.ds.seckill.model.Consumer;
 import com.ds.seckill.model.Order;
 import com.ds.seckill.model.Product;
 import com.ds.seckill.service.ConsumerService;
+import com.ds.seckill.service.KafkaProducer;
 import com.ds.seckill.util.DigestUtil;
 import com.ds.seckill.util.HttpSessionUtil;
 import com.ds.seckill.util.dto.DTO;
 import com.ds.seckill.util.dto.DTOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-@Transactional(rollbackFor = SQLException.class)
+import static com.ds.seckill.util.RedisUtil.*;
+
 @Service
 public class ConsumerServiceImpl implements ConsumerService {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     ConsumerMapper consumerMapper;
@@ -40,7 +44,40 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Resource
     OrderMapper orderMapper;
 
+    @Autowired
+    RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    KafkaProducer kafkaProducer;
+
+    private boolean getProduct(Integer productId){
+        String product = productId.toString();
+        redisTemplate.setEnableTransactionSupport(true);
+
+        watch(redisTemplate, ProductKey, product);
+        Integer count = (Integer) get(redisTemplate, ProductKey, product);
+        logger.info("product: {}", product);
+        logger.info("product count: {}", count);
+
+        try{
+            redisTemplate.multi();
+            if(count > 0){
+                increment(redisTemplate, ProductKey, product, -1);
+                redisTemplate.exec();
+                return true;
+            }
+            else {
+                redisTemplate.discard();
+                return false;
+            }
+        }catch (Exception e){
+            redisTemplate.discard();
+            return false;
+        }
+    }
+
     @Override
+    @Transactional
     public DTO register(String name, String password){
         logger.info("consumerService.register()");
         logger.info("name: {}", name);
@@ -63,6 +100,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     }
 
     @Override
+    @Transactional
     public DTO signIn(String name, String password, HttpSession httpSession){
 
         Consumer consumer = consumerMapper.getConsumerByName(name);
@@ -132,6 +170,15 @@ public class ConsumerServiceImpl implements ConsumerService {
         //TODO:
         // 1. acquire the product from redis
         // 2. write the requests to message queue
+        // The order is considered as successful when the request is successfully written to the message queue
+        if(getProduct(id)) {
+            //TODO: Kafka write failures
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            Order order = new Order(id, consumerId, now, 0);
+            logger.info("kafkaProducer.send({})", order);
+            kafkaProducer.send(order);
+            return DTOUtil.newInstance(true, "000", "Order successfully", order);
+        /*
         if(productMapper.orderProduct(id) != 1) {
             logger.info("Unable to make an order.");
         }
@@ -151,6 +198,8 @@ public class ConsumerServiceImpl implements ConsumerService {
                 //TODO: time-out
                 return DTOUtil.newInstance(true, "000", "Order successfully", order);
             }
+        }
+         */
         }
         return DTOUtil.newInstance(false, "102", "Fail to order", null);
     }

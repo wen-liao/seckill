@@ -10,4 +10,7 @@
     <update id="orderProduct" parameterType="int">
         update product set count = count - 1 where id=#{id} and count > 0
     </update>
+    <select id="getProduct" parameterType="com.ds.seckill.model.Product" resultType="com.ds.seckill.model.Product">
+        select * from product where sellerId = #{sellerId} and name = #{name} and description = #{description} and price = #{price} and count = #{count}
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.ds.seckill.controller;
 
 import com.ds.seckill.exception.UnableToSaveOrderException;
 import com.ds.seckill.service.ConsumerService;
+import com.ds.seckill.util.RedisUtil;
 import com.ds.seckill.util.HttpSessionUtil;
 import com.ds.seckill.util.dto.DTO;
 import com.ds.seckill.util.dto.DTOUtil;
@@ -24,6 +25,9 @@ public class ConsumerController {
 
     @Resource
     ConsumerService consumerService;
+
+    @Resource
+    RedisUtil redisUtil;
 
     @ResponseBody
     @RequestMapping(
@@ -79,4 +83,5 @@ public class ConsumerController {
         int consumerId = (Integer) httpSession.getAttribute("id");
         return consumerService.getCartInformation(consumerId);
     }
+
 }

@@ -39,7 +39,7 @@ public class SellerController {
         logger.info("/seller/release");
 
         //TODO: Malformed JSON body
-        JsonObject data = ((JsonObject) JsonParser.parseString(jsonString)).get("data").getAsJsonObject();
+        JsonObject data = ((JsonObject) new JsonParser().parse(jsonString)).get("data").getAsJsonObject();
         String name = JsonUtil.getFromJsonObjectAsString(data, "name"),
                 description = JsonUtil.getFromJsonObjectAsString(data, "description");
         BigDecimal price = JsonUtil.getFromJsonObjectAsDouble(data, "price");
