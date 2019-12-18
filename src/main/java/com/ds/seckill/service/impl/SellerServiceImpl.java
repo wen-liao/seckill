@@ -113,11 +113,6 @@ public class SellerServiceImpl implements SellerService {
         product = productMapper.getProduct(product);
         logger.info("product: {}", product);
 
-        //put record to redis
-        logger.info("redisUtil.putProduct({}, {}", product.getId(), product.getCount());
-        if(!putProduct(product.getId(), product.getCount())){
-            throw new RedisException("unable to cache");
-        }
         String message = "Release product successfully";
         logger.info(message);
         return DTOUtil.newInstance(true, "000", message, null);

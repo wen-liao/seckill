@@ -171,6 +171,7 @@ public class ConsumerServiceImpl implements ConsumerService {
         // 1. acquire the product from redis
         // 2. write the requests to message queue
         // The order is considered as successful when the request is successfully written to the message queue
+        /*
         if(getProduct(id)) {
             //TODO: Kafka write failures
             Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -178,7 +179,10 @@ public class ConsumerServiceImpl implements ConsumerService {
             logger.info("kafkaProducer.send({})", order);
             kafkaProducer.send(order);
             return DTOUtil.newInstance(true, "000", "Order successfully", order);
-        /*
+        }
+        */
+
+
         if(productMapper.orderProduct(id) != 1) {
             logger.info("Unable to make an order.");
         }
@@ -199,8 +203,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                 return DTOUtil.newInstance(true, "000", "Order successfully", order);
             }
         }
-         */
-        }
+
         return DTOUtil.newInstance(false, "102", "Fail to order", null);
     }
 
